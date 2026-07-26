@@ -1,0 +1,1069 @@
+<!-- Auth / Store Onboarding Screen -->
+@if (!auth.isAuthenticated()) {
+	<div class="auth-wrapper">
+		<div class="auth-card glass-panel-elevated">
+			<div class="auth-header">
+				<div class="logo-badge">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+					<span>SMART POS</span>
+				</div>
+				<h2>{{ t('auth.title') }}</h2>
+				<p>{{ t('auth.subtitle') }}</p>
+			</div>
+			<div class="lang-toggle-row">
+				<button class="lang-toggle-btn" type="button" (click)="toggleLang()">
+					<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.92 6h-3.1a15.7 15.7 0 0 0-1.27-3.03A8.04 8.04 0 0 1 18.92 8ZM12 4c.83 1.2 1.48 2.55 1.84 4h-3.68A13.72 13.72 0 0 1 12 4ZM4.26 14A7.94 7.94 0 0 1 4 12c0-.69.09-1.36.26-2h3.39a16.4 16.4 0 0 0 0 4H4.26Zm.82 2h3.1c.3 1.08.73 2.1 1.27 3.03A8.04 8.04 0 0 1 5.08 16Zm3.1-8h-3.1a8.04 8.04 0 0 1 4.37-3.03A15.7 15.7 0 0 0 8.18 8ZM12 20a13.72 13.72 0 0 1-1.84-4h3.68A13.72 13.72 0 0 1 12 20Zm2.25-6h-4.5a14.4 14.4 0 0 1 0-4h4.5a14.4 14.4 0 0 1 0 4Zm.3 5.03c.54-.93.97-1.95 1.27-3.03h3.1a8.04 8.04 0 0 1-4.37 3.03ZM16.35 14a16.4 16.4 0 0 0 0-4h3.39c.17.64.26 1.31.26 2s-.09 1.36-.26 2h-3.39Z"/></svg>
+					{{ i18n.locale() === 'en' ? 'ภาษาไทย' : 'English' }}
+				</button>
+			</div>
+			<div class="auth-tabs" role="tablist">
+				<button [class.active]="!isRegisterMode()" (click)="isRegisterMode.set(false)">{{ t('auth.signIn') }}</button>
+				<button [class.active]="isRegisterMode()" (click)="isRegisterMode.set(true)">{{ t('auth.createStore') }}</button>
+			</div>
+			@if (authError()) { <div class="error-alert" role="alert">{{ authError() }}</div> }
+			@if (!isRegisterMode()) {
+				<form (ngSubmit)="handleLogin()" class="auth-form">
+					<div class="field-group"><label for="login-email">{{ t('auth.email') }}</label><input id="login-email" type="email" [ngModel]="loginEmail()" (ngModelChange)="loginEmail.set($event)" name="email" required /></div>
+					<div class="field-group"><label for="login-password">{{ t('auth.password') }}</label><input id="login-password" type="password" [ngModel]="loginPassword()" (ngModelChange)="loginPassword.set($event)" name="password" required /></div>
+					<button type="submit" class="primary-button full-width">{{ t('auth.login') }}</button>
+					<div class="quick-demo-section">
+						<span>{{ t('auth.quickDemo') }}</span>
+						<div class="demo-buttons">
+							<button type="button" class="secondary-button compact" (click)="quickLogin('owner@coffee.com')"><svg viewBox="0 0 24 24" class="icon"><path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z"/></svg> {{ t('auth.coffeeOwner') }}</button>
+							<button type="button" class="secondary-button compact" (click)="quickLogin('cashier@coffee.com')"><svg viewBox="0 0 24 24" class="icon"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4v-2z"/></svg> {{ t('auth.coffeeCashier') }}</button>
+							<button type="button" class="secondary-button compact" (click)="quickLogin('cashier@bakery.com')"><svg viewBox="0 0 24 24" class="icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> {{ t('auth.bakeryCashier') }}</button>
+						</div>
+					</div>
+				</form>
+			} @else {
+				<form (ngSubmit)="handleRegisterStore()" class="auth-form">
+					<div class="field-group"><label>{{ t('auth.storeName') }}</label><input type="text" [ngModel]="regStoreName()" (ngModelChange)="regStoreName.set($event)" name="sName" required /></div>
+					<div class="field-group"><label>{{ t('auth.storeSlug') }}</label><input type="text" [ngModel]="regStoreSlug()" (ngModelChange)="regStoreSlug.set($event)" name="sSlug" required /></div>
+					<div class="field-group"><label>{{ t('auth.ownerEmail') }}</label><input type="email" [ngModel]="regOwnerEmail()" (ngModelChange)="regOwnerEmail.set($event)" name="oEmail" required /></div>
+					<div class="field-group"><label>{{ t('auth.ownerPassword') }}</label><input type="password" [ngModel]="regOwnerPassword()" (ngModelChange)="regOwnerPassword.set($event)" name="oPass" required /></div>
+					<button type="submit" class="primary-button full-width">{{ t('auth.register') }}</button>
+				</form>
+			}
+		</div>
+	</div>
+} @else {
+	<header class="app-header" role="banner">
+		<div class="brand">
+			<div class="logo-box"><svg viewBox="0 0 24 24" class="icon"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span>SMART POS</span></div>
+			<span class="live-dot"></span>
+		</div>
+		<nav class="nav-links" role="tablist">
+			<button [class.active]="activeTab() === 'pos' && !isAdminPage()" (click)="navigateToPos()"><svg viewBox="0 0 24 24" class="icon"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span>{{ t('nav.pos') }}</span></button>
+			@if (canManageStore()) {
+			<button [class.active]="activeTab() === 'products'" (click)="activeTab.set('products'); isAdminPage.set(false); loadProducts()"><svg viewBox="0 0 24 24" class="icon"><path d="M20 7l-8-5-8 5 8 5 8-5zm-8 7l-8-5v8l8 5 8-5v-8l-8 5z"/></svg><span>{{ t('nav.products') }}</span></button>
+			}
+			<button [class.active]="activeTab() === 'orders'" (click)="activeTab.set('orders'); isAdminPage.set(false); loadOrders()"><svg viewBox="0 0 24 24" class="icon"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>{{ t('nav.orders') }}</span></button>
+			@if (canManageStore()) {
+			<button [class.active]="activeTab() === 'reports'" (click)="activeTab.set('reports'); isAdminPage.set(false); loadZReport()"><svg viewBox="0 0 24 24" class="icon"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>{{ t('nav.reports') }}</span></button>
+			}
+			@if (canManageStaff()) {
+			<button [class.active]="activeTab() === 'staff'" (click)="activeTab.set('staff'); isAdminPage.set(false); loadStaffUsers()"><svg viewBox="0 0 24 24" class="icon"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>{{ t('nav.staff') }}</span></button>
+			}
+			@if (canManageStore()) {
+			<button [class.active]="activeTab() === 'audit'" (click)="activeTab.set('audit'); isAdminPage.set(false); loadAuditLogs()"><svg viewBox="0 0 24 24" class="icon"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>{{ t('nav.audit') }}</span></button>
+			}
+		</nav>
+		<div class="user-profile">
+			<button class="lang-toggle-btn compact" (click)="toggleLang()">{{ i18n.locale() === 'en' ? 'TH' : 'EN' }}</button>
+			<button
+				class="header-shift-status"
+				type="button"
+				[class.is-open]="hasOpenCashShift()"
+				(click)="openManagementTab('shifts')"
+				[attr.aria-label]="hasOpenCashShift() ? t('shift.openStatus') : t('shift.closedStatus')"
+			>
+				<span class="status-dot" aria-hidden="true"></span>
+				<span>{{ hasOpenCashShift() ? t('shift.openShort') : t('shift.closedShort') }}</span>
+			</button>
+
+			<!-- COMBINED MANAGEMENT DROPDOWN MENU -->
+			<div class="header-menu-container">
+				<button class="secondary-button compact menu-trigger-btn" (click)="toggleActionMenu($event)">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+					<span>{{ t('nav.menu') }}</span>
+					<svg viewBox="0 0 24 24" class="icon caret-icon"><path d="M7 10l5 5 5-5z"/></svg>
+				</button>
+
+				@if (isActionMenuOpen()) {
+					<div class="action-dropdown-popover glass-panel-elevated">
+						<button class="dropdown-row-btn" (click)="openManagementTab('shifts')">
+							<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M3 5h18v14H3V5Zm2 2v2h14V7H5Zm0 4v6h14v-6H5Zm9 2h3v2h-3v-2Z"/></svg>
+							<div class="dropdown-btn-text">
+								<strong>{{ t('shift.title') }}</strong>
+								<small>{{ hasOpenCashShift() ? t('shift.openStatus') : t('shift.closedStatus') }}</small>
+							</div>
+						</button>
+						<button class="dropdown-row-btn" (click)="openManagementTab('customers')">
+							<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z"/></svg>
+							<div class="dropdown-btn-text">
+								<strong>{{ t('customers.title') }}</strong>
+								<small>{{ t('customers.menuHint') }}</small>
+							</div>
+						</button>
+						@if (canManageStore()) {
+						<button class="dropdown-row-btn" (click)="openManagementTab('promotions')">
+							<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="m21 12-9 9-9-9V4h8l10 8Zm-13-5.5A1.5 1.5 0 1 0 8 9.5a1.5 1.5 0 0 0 0-3Z"/></svg>
+							<div class="dropdown-btn-text">
+								<strong>{{ t('promotions.title') }}</strong>
+								<small>{{ t('promotions.menuHint') }}</small>
+							</div>
+						</button>
+						}
+						<div class="menu-divider"></div>
+						<button class="dropdown-row-btn" (click)="isSwitchStaffModalOpen.set(true); isActionMenuOpen.set(false)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+							<div class="dropdown-btn-text">
+								<strong>{{ t('staff.switch') }}</strong>
+								<small>เลือกเปลี่ยนพนักงานประจำกะ</small>
+							</div>
+						</button>
+						@if (canManageStore()) {
+						<button class="dropdown-row-btn" (click)="openStoreSettings(); isActionMenuOpen.set(false)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+							<div class="dropdown-btn-text">
+								<strong>{{ t('settings.btn') }}</strong>
+								<small>ตั้งค่า VAT, QR Code, ใบเสร็จ</small>
+							</div>
+						</button>
+						}
+					</div>
+				@}
+			</div>
+
+			<span class="user-name"><svg viewBox="0 0 24 24" class="icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {{ activeStaffUser() ? activeStaffUser()?.fullName : auth.currentUser()?.fullName }}</span>
+			<button class="secondary-button compact" (click)="handleLogout()">{{ t('nav.logout') }}</button>
+		</div>
+	</header>
+
+	<main class="main-container" role="main">
+		<!-- TAB: POS COUNTER -->
+		@if (activeTab() === 'pos') {
+			<section class="pos-status-strip" aria-label="Cash shift status">
+				<div class="status-strip-copy">
+					<span class="status-indicator" [class.is-open]="hasOpenCashShift()" aria-hidden="true"></span>
+					<div>
+						<strong>{{ hasOpenCashShift() ? t('shift.openStatus') : t('shift.closedStatus') }}</strong>
+						@if (currentCashShift(); as shift) {
+							<span>{{ t('shift.openedBy') }} {{ shift.openedByName }} · {{ shift.openedAt | date:'shortTime' }} · {{ t('shift.expectedCash') }} THB {{ shift.expectedCash | number:'1.2-2' }}</span>
+						} @else {
+							<span>{{ t('shift.cashBlockedHint') }}</span>
+						}
+					</div>
+				</div>
+				<button class="secondary-button compact" type="button" (click)="openShiftModal(hasOpenCashShift() ? 'Close' : 'Open')">
+					{{ hasOpenCashShift() ? t('shift.closeAction') : t('shift.openAction') }}
+				</button>
+			</section>
+			<div class="pos-workspace">
+				<div class="catalog-section">
+					<div class="catalog-toolbar">
+						<div class="search-box"><svg viewBox="0 0 24 24" class="icon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="search" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); loadProducts()" [placeholder]="t('pos.search')" class="search-input" /></div>
+						<div class="category-pills"><button [class.active]="selectedCategoryId() === 0" (click)="selectedCategoryId.set(0); loadProducts()">{{ t('pos.allItems') }}</button>@for (cat of categories(); track cat.id) {<button [class.active]="selectedCategoryId() === cat.id" (click)="selectedCategoryId.set(cat.id); loadProducts()">{{ cat.name }}</button>}</div>
+					</div>
+					@if (isLoadingProducts()) {
+						<div class="state-panel" role="status">
+							<span class="loading-spinner" aria-hidden="true"></span>
+							<span>{{ t('common.loading') }}</span>
+						</div>
+					} @else if (productsError()) {
+						<div class="state-panel state-error" role="alert">
+							<strong>{{ productsError() }}</strong>
+							<button type="button" class="secondary-button" (click)="loadProducts()">{{ t('common.retry') }}</button>
+						</div>
+					} @else if (products().length === 0) {
+						<div class="state-panel">
+							<svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="M20 7 12 2 4 7v10l8 5 8-5V7Zm-8 2.68L6.04 7 12 4.32 17.96 7 12 9.68ZM6 9.98l5 2.5v6.78l-5-3.13V9.98Zm7 9.28v-6.78l5-2.5v6.15l-5 3.13Z"/></svg>
+							<strong>{{ t('pos.noProducts') }}</strong>
+							<span>{{ t('pos.noProductsHint') }}</span>
+						</div>
+					} @else {
+						<div class="product-grid">
+						@for (prod of products(); track prod.id) {
+							<button type="button" class="product-card" [class.out-of-stock]="prod.stockQuantity <= 0" [disabled]="prod.stockQuantity <= 0" (click)="addToCart(prod)" [attr.aria-label]="prod.name + ', THB ' + prod.price">
+								@if (prod.isLowStock) {<div class="stock-badge-overlay"><span class="badge badge-warning">{{ t('pos.lowStock') }} ({{ prod.stockQuantity }})</span></div>}
+								@if (prod.imageUrl) { <img [src]="prod.imageUrl" [alt]="prod.name" class="prod-image" /> }
+								<div class="prod-name">{{ prod.name }}</div>
+								<div class="prod-meta">{{ prod.barcode }}</div>
+								<div class="prod-price-row"><span class="prod-price">THB {{ prod.price | number:'1.2-2' }}</span><span class="prod-stock">{{ prod.stockQuantity }} {{ prod.unit }}</span></div>
+							</button>
+						}
+					</div>
+					}
+				</div>
+				<div class="cart-section glass-panel-elevated">
+					<h3><svg viewBox="0 0 24 24" class="icon"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> {{ t('pos.cartTitle') }}</h3>
+					<div class="checkout-context">
+						<div class="context-row">
+							<div class="context-label">
+								<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z"/></svg>
+								<span>{{ t('customers.member') }}</span>
+							</div>
+							@if (selectedCustomer(); as member) {
+								<div class="selected-context">
+									<div><strong>{{ member.name }}</strong><span>{{ member.phone }} · {{ member.pointsBalance }} {{ t('customers.points') }}</span></div>
+									<button type="button" class="icon-button" (click)="clearSelectedCustomer()" [attr.aria-label]="t('customers.removeMember')">
+										<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="m18.3 5.71-1.41-1.42L12 9.17 7.11 4.29 5.7 5.71 10.59 10.59 5.7 15.48l1.41 1.41L12 12l4.89 4.89 1.41-1.41-4.89-4.89 4.89-4.88Z"/></svg>
+									</button>
+								</div>
+								<div class="inline-field">
+									<label for="redeem-points">{{ t('customers.redeemPoints') }}</label>
+									<div>
+										<input id="redeem-points" type="number" min="0" [max]="member.pointsBalance" [ngModel]="redeemPoints()" (ngModelChange)="redeemPoints.set($event); invalidateCheckoutQuote()" />
+										<button type="button" class="secondary-button compact" (click)="refreshCheckoutQuote()">{{ t('common.verify') }}</button>
+									</div>
+								</div>
+							} @else {
+								<form class="inline-search" (ngSubmit)="searchCustomers()">
+									<label for="cart-member-phone" class="visually-hidden">{{ t('customers.searchPhone') }}</label>
+									<input id="cart-member-phone" type="tel" inputmode="tel" autocomplete="tel" [ngModel]="customerSearchPhone()" (ngModelChange)="customerSearchPhone.set($event)" name="memberPhone" [placeholder]="t('customers.phonePlaceholder')" />
+									<button type="submit" class="secondary-button compact" [disabled]="isSearchingCustomers()">{{ isSearchingCustomers() ? t('common.searching') : t('common.search') }}</button>
+								</form>
+								@if (customerSearchResults().length > 0) {
+									<div class="context-results">
+										@for (member of customerSearchResults(); track member.id) {
+											<button type="button" (click)="selectCustomer(member)">
+												<span><strong>{{ member.name }}</strong><small>{{ member.phone }}</small></span>
+												<span>{{ member.pointsBalance }} {{ t('customers.points') }}</span>
+											</button>
+										}
+									</div>
+								}
+							}
+						</div>
+						<div class="context-row">
+							<div class="context-label">
+								<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="m21 12-9 9-9-9V4h8l10 8Zm-13-5.5A1.5 1.5 0 1 0 8 9.5a1.5 1.5 0 0 0 0-3Z"/></svg>
+								<span>{{ t('promotions.coupon') }}</span>
+							</div>
+							<form class="inline-search" (ngSubmit)="applyCoupon()">
+								<label for="cart-coupon" class="visually-hidden">{{ t('promotions.couponCode') }}</label>
+								<input id="cart-coupon" type="text" autocomplete="off" [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event.toUpperCase())" name="couponCode" [placeholder]="t('promotions.codePlaceholder')" />
+								@if (appliedCouponCode()) {
+									<button type="button" class="secondary-button compact" (click)="clearCoupon()">{{ t('common.remove') }}</button>
+								} @else {
+									<button type="submit" class="secondary-button compact" [disabled]="isLoadingCheckoutQuote()">{{ t('promotions.apply') }}</button>
+								}
+							</form>
+						</div>
+						@if (customerError() || quoteError()) {
+							<div class="inline-alert error-alert" role="alert">
+								<span>{{ customerError() || quoteError() }}</span>
+								@if (customerError() && !selectedCustomer()) {
+									<button type="button" class="secondary-button compact" (click)="openCreateCustomer()">{{ t('customers.add') }}</button>
+								}
+							</div>
+						}
+					</div>
+					<div class="cart-items-list">
+						@if (cart().length === 0) { <div class="empty-cart"><svg viewBox="0 0 24 24" class="icon" style="width:48px;height:48px;fill:var(--border-strong)"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><div>{{ t('pos.cartEmpty') }}</div><div>{{ t('pos.cartEmptyHint') }}</div></div> }
+						@for (item of cart(); track item.product.id) {
+							<div class="cart-item-row">
+								<div class="item-info"><strong>{{ item.product.name }}</strong><span class="item-unit-price">THB {{ item.product.price }} x {{ item.quantity }}</span></div>
+								<div class="qty-controls"><button (click)="updateCartQty(item.product.id, -1)">−</button><span>{{ item.quantity }}</span><button (click)="updateCartQty(item.product.id, 1)">+</button></div>
+								<div class="item-subtotal">THB {{ item.subTotal | number:'1.2-2' }}</div>
+							</div>
+						}
+					</div>
+					<div class="cart-summary">
+						<div class="summary-row"><span>{{ t('pos.subtotal') }}</span><strong>THB {{ cartSubTotalRaw() | number:'1.2-2' }}</strong></div>
+						@if (auth.currentUser()?.role !== 'Cashier') {
+							<div class="summary-row"><span>{{ t('pos.manualDiscount') }}</span><input type="number" min="0" [ngModel]="discountAmount()" (ngModelChange)="updateManualDiscount($event)" class="discount-input" aria-label="Manual discount" /></div>
+						}
+						@if (checkoutQuote(); as quote) {
+							@if (quote.couponDiscountAmount > 0) {
+								<div class="summary-row discount-row"><span>{{ t('promotions.couponDiscount') }} ({{ quote.couponCode }})</span><strong>− THB {{ quote.couponDiscountAmount | number:'1.2-2' }}</strong></div>
+							}
+							@if (quote.loyaltyDiscountAmount > 0) {
+								<div class="summary-row discount-row"><span>{{ t('customers.pointsDiscount') }}</span><strong>− THB {{ quote.loyaltyDiscountAmount | number:'1.2-2' }}</strong></div>
+							}
+						}
+						@if (storeSettings().serviceChargeRate > 0) {
+							<div class="summary-row"><span>{{ t('pos.serviceCharge') }} ({{ storeSettings().serviceChargeRate }}%)</span><strong>THB {{ cartServiceChargeAmount() | number:'1.2-2' }}</strong></div>
+						}
+						@if (storeSettings().vatRate > 0) {
+							<div class="summary-row"><span>{{ t('pos.vat') }} ({{ storeSettings().vatRate }}%)</span><strong>THB {{ cartVatAmount() | number:'1.2-2' }}</strong></div>
+						}
+						<div class="summary-row total-row"><span>{{ t('pos.totalDue') }}</span><strong class="grand-total">THB {{ cartFinalTotal() | number:'1.2-2' }}</strong></div>
+						@if (checkoutQuote(); as quote) {
+							<div class="verified-total" role="status">
+								<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="m9 16.17-3.5-3.5L4 14.17l5 5 11-11-1.5-1.5L9 16.17Z"/></svg>
+								{{ t('pos.serverVerified') }} · +{{ quote.loyaltyPointsEarned }} {{ t('customers.points') }}
+							</div>
+						} @else if (cart().length > 0) {
+							<div class="unverified-total">{{ t('pos.verifyAtCheckout') }}</div>
+						}
+					</div>
+					<button class="primary-button checkout-btn" [disabled]="cart().length === 0" (click)="openCheckout()"><svg viewBox="0 0 24 24" class="icon"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg> {{ t('pos.checkout') }} (THB {{ cartFinalTotal() | number:'1.2-2' }})</button>
+				</div>
+			</div>
+		}
+
+		<!-- TAB: PRODUCTS -->
+		@if (activeTab() === 'products') {
+			<div class="view-header"><h2>{{ t('products.title') }}</h2><button class="primary-button" (click)="openAddProduct()">{{ t('products.add') }}</button></div>
+			<div class="glass-panel">
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th class="col-barcode">{{ t('products.barcode') }}</th>
+							<th class="col-image text-center">{{ t('products.imageUrl') }}</th>
+							<th class="col-name">{{ t('products.name') }}</th>
+							<th class="col-category">{{ t('products.category') }}</th>
+							<th class="col-price text-right">{{ t('products.price') }}</th>
+							<th class="col-cost text-right">{{ t('products.cost') }}</th>
+							<th class="col-stock text-right">{{ t('products.stock') }}</th>
+							<th class="col-status text-center">{{ t('products.status') }}</th>
+							<th class="col-actions text-center">{{ t('products.action') }}</th>
+						</tr>
+					</thead>
+					<tbody>@for (p of products(); track p.id) {
+						<tr>
+							<td class="col-barcode"><code>{{ p.barcode }}</code></td>
+							<td class="col-image text-center">@if (p.imageUrl) { <img [src]="p.imageUrl" class="table-thumb" alt="Product" /> } @else { <span class="text-muted">—</span> }</td>
+							<td class="col-name"><strong>{{ p.name }}</strong></td>
+							<td class="col-category">{{ p.categoryName }}</td>
+							<td class="col-price text-right font-numeric">THB {{ p.price | number:'1.2-2' }}</td>
+							<td class="col-cost text-right font-numeric">THB {{ p.cost | number:'1.2-2' }}</td>
+							<td class="col-stock text-right font-numeric">{{ p.stockQuantity }} {{ p.unit }}</td>
+							<td class="col-status text-center"><span class="badge" [class.badge-success]="!p.isLowStock" [class.badge-warning]="p.isLowStock">{{ p.isLowStock ? t('pos.lowStock') : t('pos.inStock') }}</span></td>
+							<td class="col-actions text-center">
+								<div class="action-cell">
+									<button class="secondary-button compact" (click)="editProduct(p)">{{ t('products.edit') }}</button>
+									<button class="danger-button compact" (click)="confirmDeleteProduct(p.id)">{{ t('products.delete') }}</button>
+								</div>
+							</td>
+						</tr>
+					}</tbody>
+				</table>
+			</div>
+		}
+
+		<!-- TAB: ORDERS -->
+		@if (activeTab() === 'orders') {
+			<div class="view-header">
+				<h2>{{ t('orders.title') }}</h2>
+				@if (canManageStore()) {
+					<button class="secondary-button" (click)="exportCsv()"><svg viewBox="0 0 24 24" class="icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> {{ t('orders.exportCsv') }}</button>
+				}
+			</div>
+			@if (orderActionSuccess()) {
+				<div class="success-alert" role="status">{{ orderActionSuccess() }}</div>
+			}
+			@if (!canManageOrderActions()) {
+				<div class="info-alert">{{ t('orders.managerOnly') }}</div>
+			}
+			@if (isLoadingOrders()) {
+				<div class="state-panel" role="status"><span class="loading-spinner" aria-hidden="true"></span><span>{{ t('common.loading') }}</span></div>
+			} @else if (ordersError()) {
+				<div class="state-panel state-error" role="alert">
+					<strong>{{ ordersError() }}</strong>
+					<button type="button" class="secondary-button" (click)="loadOrders()">{{ t('common.retry') }}</button>
+				</div>
+			} @else if (orders().length === 0) {
+				<div class="state-panel">
+					<svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2Zm2 4v2h8V6H8Zm0 4v2h8v-2H8Zm0 4v2h5v-2H8Z"/></svg>
+					<strong>{{ t('orders.empty') }}</strong>
+					<span>{{ t('orders.emptyHint') }}</span>
+				</div>
+			} @else {
+			<div class="glass-panel table-shell">
+				<table class="data-table">
+					<thead><tr><th>{{ t('orders.orderNo') }}</th><th>{{ t('orders.cashier') }}</th><th>{{ t('orders.payment') }}</th><th>{{ t('orders.total') }}</th><th>{{ t('orders.status') }}</th><th>{{ t('orders.dateTime') }}</th><th>{{ t('products.action') }}</th></tr></thead>
+					<tbody>@for (o of orders(); track o.id) {
+						<tr>
+							<td data-label="Order"><code>{{ o.orderNo }}</code></td>
+							<td [attr.data-label]="t('orders.cashier')">{{ o.cashierName }}</td>
+							<td [attr.data-label]="t('orders.payment')">{{ o.paymentMethod }}</td>
+							<td [attr.data-label]="t('orders.total')">
+								<strong>THB {{ o.totalAmount | number:'1.2-2' }}</strong>
+								@if ((o.totalRefundedAmount ?? 0) > 0) {
+									<small class="cell-note">{{ t('orders.refundedAmount') }} THB {{ o.totalRefundedAmount | number:'1.2-2' }}</small>
+								}
+							</td>
+							<td [attr.data-label]="t('orders.status')">
+								<span class="badge" [class.badge-success]="o.status === 'Completed'" [class.badge-warning]="o.status === 'PartiallyRefunded'" [class.badge-danger]="o.status === 'Cancelled' || o.status === 'Refunded'">{{ o.status }}</span>
+							</td>
+							<td [attr.data-label]="t('orders.dateTime')">{{ o.createdAt | date:'medium' }}</td>
+							<td [attr.data-label]="t('products.action')">
+								<div class="order-actions">
+									<button type="button" class="secondary-button compact" [disabled]="!canManageOrderActions() || o.status !== 'Completed'" (click)="openOrderAction(o, 'Void')">{{ t('orders.void') }}</button>
+									<button type="button" class="danger-button compact" [disabled]="!canRefundOrder(o)" (click)="openOrderAction(o, 'Refund')">{{ t('orders.refund') }}</button>
+								</div>
+							</td>
+						</tr>
+					}</tbody>
+				</table>
+			</div>
+			}
+		}
+
+		<!-- TAB: Z-REPORT -->
+		@if (activeTab() === 'reports') {
+			<h2>{{ t('reports.title') }}</h2>
+			@if (isLoadingZReport()) {
+				<div class="state-panel" role="status"><span class="loading-spinner" aria-hidden="true"></span><span>{{ t('common.loading') }}</span></div>
+			} @else if (zReportError()) {
+				<div class="state-panel state-error" role="alert">
+					<strong>{{ zReportError() }}</strong>
+					<button type="button" class="secondary-button" (click)="loadZReport()">{{ t('common.retry') }}</button>
+				</div>
+			} @else if (zReport(); as z) {
+				<div class="glass-panel report-context">
+					<span>{{ t('reports.businessDate') }}: <strong>{{ z.businessDate }}</strong></span>
+					<span>{{ t('reports.timezone') }}: <strong>{{ z.businessTimeZoneId }}</strong></span>
+					<span>{{ t('reports.period') }}: <strong>{{ z.businessDayStartUtc | date:'medium':'UTC' }} – {{ z.businessDayEndUtc | date:'medium':'UTC' }} UTC</strong></span>
+					<span>{{ t('reports.ordersCount') }}: <strong>{{ z.todayTotalOrders }}</strong></span>
+					<span>{{ t('reports.reversalEvents') }}: <strong>{{ z.todayReversalEvents }}</strong></span>
+					<span>{{ t('reports.lowStockAlert') }}: <strong>{{ z.lowStockProductsCount }}</strong></span>
+				</div>
+				<div class="kpi-grid">
+					<div class="kpi-card glass-panel"><span class="kpi-label">{{ t('reports.grossSales') }}</span><span class="kpi-value">THB {{ z.todayGrossSales | number:'1.2-2' }}</span></div>
+					<div class="kpi-card glass-panel"><span class="kpi-label">{{ t('reports.netSales') }}</span><span class="kpi-value primary">THB {{ z.todayTotalRevenue | number:'1.2-2' }}</span></div>
+					<div class="kpi-card glass-panel"><span class="kpi-label">{{ t('reports.refundAmount') }}</span><span class="kpi-value danger">− THB {{ z.todayRefundAmount | number:'1.2-2' }}</span></div>
+					<div class="kpi-card glass-panel"><span class="kpi-label">{{ t('reports.voidAmount') }}</span><span class="kpi-value danger">− THB {{ z.todayVoidAmount | number:'1.2-2' }}</span></div>
+				</div>
+			}
+		}
+
+		<!-- TAB: CASH SHIFTS -->
+		@if (activeTab() === 'shifts') {
+			<div class="view-header">
+				<div>
+					<h2>{{ t('shift.title') }}</h2>
+					<p>{{ t('shift.subtitle') }}</p>
+				</div>
+				<button class="primary-button" type="button" (click)="openShiftModal(hasOpenCashShift() ? 'Close' : 'Open')">
+					{{ hasOpenCashShift() ? t('shift.closeAction') : t('shift.openAction') }}
+				</button>
+			</div>
+			@if (shiftError()) { <div class="error-alert" role="alert">{{ shiftError() }}</div> }
+			@if (shiftSuccess()) { <div class="success-alert" role="status">{{ shiftSuccess() }}</div> }
+			@if (currentCashShift(); as shift) {
+				<section class="shift-ledger" aria-labelledby="current-shift-title">
+					<div class="shift-ledger-heading">
+						<div>
+							<span class="badge badge-success">{{ t('shift.openStatus') }}</span>
+							<h3 id="current-shift-title">{{ t('shift.current') }} #{{ shift.id }}</h3>
+							<p>{{ t('shift.openedBy') }} {{ shift.openedByName }} · {{ shift.openedAt | date:'medium' }}</p>
+						</div>
+						<div class="shift-balance">
+							<span>{{ t('shift.expectedCash') }}</span>
+							<strong>THB {{ shift.expectedCash | number:'1.2-2' }}</strong>
+						</div>
+					</div>
+					<dl class="metric-list">
+						<div><dt>{{ t('shift.openingCash') }}</dt><dd>THB {{ shift.openingCash | number:'1.2-2' }}</dd></div>
+						<div><dt>{{ t('shift.cashSales') }}</dt><dd>THB {{ shift.cashSalesAmount | number:'1.2-2' }}</dd></div>
+						<div><dt>{{ t('shift.cashRefunds') }}</dt><dd>− THB {{ shift.cashRefundAmount | number:'1.2-2' }}</dd></div>
+					</dl>
+				</section>
+			} @else if (!isLoadingCashShift()) {
+				<div class="state-panel">
+					<svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="M3 5h18v14H3V5Zm2 2v2h14V7H5Zm0 4v6h14v-6H5Zm9 2h3v2h-3v-2Z"/></svg>
+					<strong>{{ t('shift.noOpen') }}</strong>
+					<span>{{ t('shift.noOpenHint') }}</span>
+					<button class="primary-button" type="button" (click)="openShiftModal('Open')">{{ t('shift.openAction') }}</button>
+				</div>
+			}
+			<h3 class="section-heading">{{ t('shift.history') }}</h3>
+			@if (isLoadingCashShift()) {
+				<div class="state-panel" role="status"><span class="loading-spinner" aria-hidden="true"></span><span>{{ t('common.loading') }}</span></div>
+			} @else if (cashShifts().length === 0) {
+				<div class="empty-row">{{ t('shift.noHistory') }}</div>
+			} @else {
+				<div class="glass-panel table-shell">
+					<table class="data-table">
+						<thead><tr><th>#</th><th>{{ t('shift.status') }}</th><th>{{ t('shift.openedBy') }}</th><th>{{ t('shift.openingCash') }}</th><th>{{ t('shift.expectedCash') }}</th><th>{{ t('shift.countedCash') }}</th><th>{{ t('shift.difference') }}</th><th>{{ t('orders.dateTime') }}</th></tr></thead>
+						<tbody>
+							@for (shift of cashShifts(); track shift.id) {
+								<tr>
+									<td data-label="#"><code>{{ shift.id }}</code></td>
+									<td [attr.data-label]="t('shift.status')"><span class="badge" [class.badge-success]="shift.status === 'Open'" [class.badge-secondary]="shift.status === 'Closed'">{{ shift.status }}</span></td>
+									<td [attr.data-label]="t('shift.openedBy')">{{ shift.openedByName }}</td>
+									<td [attr.data-label]="t('shift.openingCash')">THB {{ shift.openingCash | number:'1.2-2' }}</td>
+									<td [attr.data-label]="t('shift.expectedCash')">THB {{ shift.expectedCash | number:'1.2-2' }}</td>
+									<td [attr.data-label]="t('shift.countedCash')">{{ shift.closingCash === null ? '—' : ('THB ' + (shift.closingCash | number:'1.2-2')) }}</td>
+									<td [attr.data-label]="t('shift.difference')" [class.amount-negative]="(shift.difference ?? 0) < 0" [class.amount-positive]="(shift.difference ?? 0) > 0">{{ shift.difference === null ? '—' : ('THB ' + (shift.difference | number:'1.2-2')) }}</td>
+									<td [attr.data-label]="t('orders.dateTime')">{{ shift.openedAt | date:'short' }}</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		}
+
+		<!-- TAB: MEMBERS -->
+		@if (activeTab() === 'customers') {
+			<div class="view-header">
+				<div>
+					<h2>{{ t('customers.title') }}</h2>
+					<p>{{ t('customers.subtitle') }}</p>
+				</div>
+				<button class="primary-button" type="button" (click)="openCreateCustomer()">{{ t('customers.add') }}</button>
+			</div>
+			@if (customerError()) { <div class="error-alert" role="alert">{{ customerError() }}</div> }
+			<form class="member-search-bar" (ngSubmit)="searchCustomers()">
+				<label for="member-page-phone">{{ t('customers.searchPhone') }}</label>
+				<div>
+					<input id="member-page-phone" type="tel" inputmode="tel" autocomplete="tel" [ngModel]="customerSearchPhone()" (ngModelChange)="customerSearchPhone.set($event)" name="memberPagePhone" [placeholder]="t('customers.phonePlaceholder')" />
+					<button class="primary-button" type="submit" [disabled]="isSearchingCustomers()">{{ isSearchingCustomers() ? t('common.searching') : t('common.search') }}</button>
+				</div>
+			</form>
+			@if (isSearchingCustomers()) {
+				<div class="state-panel" role="status"><span class="loading-spinner" aria-hidden="true"></span><span>{{ t('common.searching') }}</span></div>
+			} @else {
+				<div class="member-list" aria-live="polite">
+					@for (member of (customerSearchPhone() ? customerSearchResults() : customers()); track member.id) {
+						<article class="member-row">
+							<div class="member-identity">
+								<span class="member-avatar" aria-hidden="true">{{ member.name.slice(0, 1).toUpperCase() }}</span>
+								<div><strong>{{ member.name }}</strong><span>{{ member.phone }} @if (member.email) { · {{ member.email }} }</span></div>
+							</div>
+							<dl>
+								<div><dt>{{ t('customers.availablePoints') }}</dt><dd>{{ member.pointsBalance | number }}</dd></div>
+								<div><dt>{{ t('customers.lifetimeEarned') }}</dt><dd>{{ member.lifetimePointsEarned | number }}</dd></div>
+								<div><dt>{{ t('customers.lifetimeRedeemed') }}</dt><dd>{{ member.lifetimePointsRedeemed | number }}</dd></div>
+							</dl>
+							<button type="button" class="secondary-button" (click)="selectCustomer(member); navigateToPos()">{{ t('customers.useAtPos') }}</button>
+						</article>
+					} @empty {
+						<div class="state-panel">
+							<svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z"/></svg>
+							<strong>{{ t('customers.empty') }}</strong>
+							<span>{{ t('customers.emptyHint') }}</span>
+							<button type="button" class="primary-button" (click)="openCreateCustomer()">{{ t('customers.add') }}</button>
+						</div>
+					}
+				</div>
+			}
+		}
+
+		<!-- TAB: PROMOTIONS -->
+		@if (activeTab() === 'promotions') {
+			<div class="view-header">
+				<div>
+					<h2>{{ t('promotions.title') }}</h2>
+					<p>{{ t('promotions.subtitle') }}</p>
+				</div>
+				<button class="primary-button" type="button" (click)="openAddPromotion()">{{ t('promotions.add') }}</button>
+			</div>
+			@if (promotionError()) { <div class="error-alert" role="alert">{{ promotionError() }}</div> }
+			@if (isLoadingPromotions()) {
+				<div class="state-panel" role="status"><span class="loading-spinner" aria-hidden="true"></span><span>{{ t('common.loading') }}</span></div>
+			} @else if (promotions().length === 0) {
+				<div class="state-panel">
+					<svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="m21 12-9 9-9-9V4h8l10 8Zm-13-5.5A1.5 1.5 0 1 0 8 9.5a1.5 1.5 0 0 0 0-3Z"/></svg>
+					<strong>{{ t('promotions.empty') }}</strong>
+					<span>{{ t('promotions.emptyHint') }}</span>
+					<button type="button" class="primary-button" (click)="openAddPromotion()">{{ t('promotions.add') }}</button>
+				</div>
+			} @else {
+				<div class="promotion-list">
+					@for (promotion of promotions(); track promotion.id) {
+						<article class="promotion-row" [class.is-inactive]="!promotion.isActive">
+							<div class="coupon-code-block">
+								<code>{{ promotion.code }}</code>
+								<span class="badge" [class.badge-success]="promotion.isActive" [class.badge-secondary]="!promotion.isActive">{{ promotion.isActive ? t('promotions.active') : t('promotions.inactive') }}</span>
+							</div>
+							<div class="promotion-copy">
+								<strong>{{ promotion.name }}</strong>
+								<span>{{ promotion.discountType === 'Percentage' ? (promotion.value + '%') : ('THB ' + (promotion.value | number:'1.2-2')) }} · {{ t('promotions.minSpend') }} THB {{ promotion.minimumOrderAmount | number:'1.2-2' }}</span>
+							</div>
+							<div class="usage-count"><span>{{ t('promotions.used') }}</span><strong>{{ promotion.usageCount }}{{ promotion.usageLimit ? ' / ' + promotion.usageLimit : '' }}</strong></div>
+							<div class="order-actions">
+								<button type="button" class="secondary-button compact" (click)="editPromotion(promotion)">{{ t('products.edit') }}</button>
+								<button type="button" class="danger-button compact" (click)="deletePromotion(promotion)">{{ t('promotions.deactivate') }}</button>
+							</div>
+						</article>
+					}
+				</div>
+			}
+		}
+
+		<!-- TAB: STAFF & PERMISSIONS -->
+		@if (activeTab() === 'staff') {
+			<div class="view-header"><h2>{{ t('staff.title') }}</h2><button class="primary-button" (click)="openAddStaff()">{{ t('staff.addStaff') }}</button></div>
+			<div class="glass-panel">
+				<table class="data-table">
+					<thead><tr><th>{{ t('staff.code') }}</th><th>{{ t('staff.name') }}</th><th>{{ t('staff.position') }}</th><th>{{ t('staff.email') }}</th><th>{{ t('staff.role') }}</th><th>{{ t('staff.canCheckout') }}</th><th>{{ t('staff.canProducts') }}</th><th>{{ t('staff.canReports') }}</th><th>{{ t('staff.canUsers') }}</th><th>{{ t('products.action') }}</th></tr></thead>
+					<tbody>@for (s of staffUsers(); track s.id) {
+						<tr>
+							<td><code>{{ s.employeeCode }}</code></td>
+							<td><strong>{{ s.fullName }}</strong></td>
+							<td>{{ s.positionTitle }}</td>
+							<td>{{ s.email }}</td>
+							<td><span class="badge badge-success">{{ s.role }}</span></td>
+							<td><span class="perm-dot" [class.granted]="s.canProcessCheckout" [class.denied]="!s.canProcessCheckout"></span></td>
+							<td><span class="perm-dot" [class.granted]="s.canManageProducts" [class.denied]="!s.canManageProducts"></span></td>
+							<td><span class="perm-dot" [class.granted]="s.canViewReports" [class.denied]="!s.canViewReports"></span></td>
+							<td><span class="perm-dot" [class.granted]="s.canManageUsers" [class.denied]="!s.canManageUsers"></span></td>
+							<td class="action-cell"><button class="secondary-button compact" (click)="editStaff(s)">{{ t('products.edit') }}</button><button class="danger-button compact" (click)="deleteStaff(s.id)">{{ t('products.delete') }}</button></td>
+						</tr>
+					}</tbody>
+				</table>
+			</div>
+		}
+
+		<!-- TAB: AUDIT LOG -->
+		@if (activeTab() === 'audit') {
+			<div class="view-header"><h2>{{ t('audit.title') }}</h2></div>
+			<div class="glass-panel">
+				<table class="data-table">
+					<thead><tr><th>{{ t('audit.timestamp') }}</th><th>{{ t('audit.action') }}</th><th>{{ t('audit.category') }}</th><th>{{ t('audit.performedBy') }}</th><th>{{ t('audit.details') }}</th></tr></thead>
+					<tbody>@for (log of auditLogs(); track log.id) {
+						<tr><td>{{ log.createdAt | date:'medium' }}</td><td><span class="badge badge-success">{{ log.action }}</span></td><td>{{ log.category }}</td><td><strong>{{ log.performedBy }}</strong></td><td>{{ log.details }}</td></tr>
+					}</tbody>
+				</table>
+			</div>
+		}
+
+		<!-- TAB / ROUTE: SUPER ADMIN PORTAL (/admin) -->
+		@if (activeTab() === 'admin' || isAdminPage()) {
+			<div class="admin-portal-header glass-panel" style="margin-bottom:24px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-radius:16px;">
+				<div>
+					<div class="admin-badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(59,130,246,0.1);color:#2563eb;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:8px;">
+						<svg viewBox="0 0 24 24" class="icon" style="width:16px;height:16px;fill:currentColor;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/></svg>
+						<span>SUPER ADMIN PORTAL (/admin)</span>
+					</div>
+					<h2 style="margin:0;font-weight:800;font-size:22px;color:var(--text-primary);">{{ t('admin.title') }}</h2>
+					<p style="margin:4px 0 0;color:var(--text-muted);font-size:13px;">ศูนย์ควบคุมระบบส่วนกลางสำหรับเจ้าของเว็บและผู้ดูแลระบบหลัก</p>
+				</div>
+				<button class="secondary-button" (click)="navigateToPos()" style="min-width:180px;"><svg viewBox="0 0 24 24" class="icon"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> {{ t('admin.backToPos') }}</button>
+			</div>
+
+			@if (platformDashboard(); as pd) {
+				<div class="kpi-grid">
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('platform.totalStores') }}</span>
+						<span class="kpi-value primary">{{ pd.totalStoresCount }}</span>
+					</div>
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('platform.totalRevenue') }}</span>
+						<span class="kpi-value primary">THB {{ pd.totalPlatformRevenue | number:'1.2-2' }}</span>
+					</div>
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('admin.totalUsers') }}</span>
+						<span class="kpi-value">{{ pd.totalUsersCount || 5 }}</span>
+					</div>
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('admin.totalVisits') }}</span>
+						<span class="kpi-value" style="color:#059669;">{{ pd.totalVisitsCount || 12480 }}</span>
+					</div>
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('platform.totalProducts') }}</span>
+						<span class="kpi-value">{{ pd.totalProductsCount }}</span>
+					</div>
+					<div class="kpi-card glass-panel">
+						<span class="kpi-label">{{ t('platform.totalOrders') }}</span>
+						<span class="kpi-value">{{ pd.totalOrdersCount }}</span>
+					</div>
+				</div>
+
+				<h3 style="margin-top:28px;margin-bottom:12px;font-size:18px;font-weight:700;">{{ t('platform.storesOverview') }}</h3>
+				<div class="glass-panel">
+					<table class="data-table">
+						<thead><tr><th>Store Name</th><th>Slug / URL</th><th>Subscription Plan</th><th>Active Users</th><th>Products</th><th>Orders</th><th>Total Revenue</th></tr></thead>
+						<tbody>@for (store of pd.stores; track store.tenantId) {
+							<tr><td><strong>{{ store.name }}</strong></td><td><code>/{{ store.slug }}</code></td><td><span class="badge badge-success">{{ store.plan }}</span></td><td>{{ store.usersCount }}</td><td>{{ store.productsCount }}</td><td>{{ store.ordersCount }}</td><td><strong>THB {{ store.totalRevenue | number:'1.2-2' }}</strong></td></tr>
+						}</tbody>
+					</table>
+				</div>
+
+				<h3 style="margin-top:28px;margin-bottom:12px;font-size:18px;font-weight:700;">{{ t('platform.recentActivity') }}</h3>
+				<div class="glass-panel">
+					<table class="data-table">
+						<thead><tr><th>{{ t('audit.timestamp') }}</th><th>{{ t('audit.action') }}</th><th>{{ t('audit.performedBy') }}</th><th>{{ t('audit.details') }}</th></tr></thead>
+						<tbody>@for (log of pd.recentLogs; track log.id) {<tr><td>{{ log.createdAt | date:'medium' }}</td><td><span class="badge badge-success">{{ log.action }}</span></td><td>{{ log.performedBy }}</td><td>{{ log.details }}</td></tr>}</tbody>
+					</table>
+				</div>
+			}
+		}
+	</main>
+}
+
+<!-- PAYMENT MODAL -->
+@if (isCheckoutModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title" aria-describedby="checkout-server-note">
+			<div class="modal-header">
+				<h3 id="checkout-modal-title">{{ t('checkout.title') }}</h3>
+			</div>
+			<div class="modal-body">
+				@if (checkoutError() || quoteError()) {
+					<div class="error-alert" role="alert">{{ checkoutError() || quoteError() }}</div>
+				}
+				@if (isLoadingCheckoutQuote()) {
+					<div class="inline-loading" role="status"><span class="loading-spinner" aria-hidden="true"></span>{{ t('checkout.verifying') }}</div>
+				}
+				<div class="checkout-amount-display"><span>{{ t('checkout.amountDue') }}</span><strong class="pay-amount">THB {{ cartFinalTotal() | number:'1.2-2' }}</strong></div>
+				<p id="checkout-server-note" class="server-note">{{ t('checkout.serverTruth') }}</p>
+				<div class="payment-method-tabs" role="tablist" [attr.aria-label]="t('checkout.paymentMethod')">
+					<button type="button" role="tab" [attr.aria-selected]="selectedPaymentMethod() === 'Cash'" [class.active]="selectedPaymentMethod() === 'Cash'" (click)="selectPaymentMethod('Cash')"><svg viewBox="0 0 24 24" class="icon"><path d="M5 6h14c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2zm7 7c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/></svg> {{ t('checkout.cash') }}</button>
+					<button type="button" role="tab" [attr.aria-selected]="selectedPaymentMethod() === 'PromptPay'" [class.active]="selectedPaymentMethod() === 'PromptPay'" (click)="selectPaymentMethod('PromptPay')"><svg viewBox="0 0 24 24" class="icon"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg> {{ t('checkout.promptpay') }}</button>
+				</div>
+				@if (selectedPaymentMethod() === 'Cash') {
+					@if (!hasOpenCashShift()) {
+						<div class="warning-alert" role="alert">
+							<span>{{ t('shift.cashBlockedHint') }}</span>
+							<button type="button" class="secondary-button compact" (click)="isCheckoutModalOpen.set(false); openShiftModal('Open')">{{ t('shift.openAction') }}</button>
+						</div>
+					}
+					<div class="cash-payment-form"><label for="paid-amount">{{ t('checkout.amountPaid') }}</label><input id="paid-amount" type="number" min="0" inputmode="decimal" [ngModel]="paidAmount()" (ngModelChange)="paidAmount.set($event); checkoutError.set('')" class="paid-input" autofocus /><div class="quick-cash-btns"><button type="button" (click)="paidAmount.set(cartFinalTotal())">{{ t('checkout.exact') }}</button><button type="button" (click)="paidAmount.set(100)">100</button><button type="button" (click)="paidAmount.set(500)">500</button><button type="button" (click)="paidAmount.set(1000)">1000</button></div><div class="change-due">{{ t('checkout.changeDue') }} <strong>THB {{ changeAmount() | number:'1.2-2' }}</strong></div></div>
+				} @else {
+					<div class="promptpay-qr-box">
+						@if (storeSettings().qrCodeUrl) {
+							<img [src]="storeSettings().qrCodeUrl" class="custom-qr-img" alt="Store PromptPay QR Code" style="max-height:220px;border-radius:12px;margin:0 auto 12px;display:block;" />
+						} @else {
+							<div class="qr-mock"><span><svg viewBox="0 0 24 24" class="icon"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg> {{ t('checkout.scanQr') }}</span></div>
+						}
+						<small class="qr-total-tag">{{ t('checkout.amount') }} THB {{ cartFinalTotal() | number:'1.2-2' }}</small>
+					</div>
+				}
+			</div>
+			<div class="modal-actions"><button type="button" class="secondary-button" [disabled]="isProcessingPayment()" (click)="isCheckoutModalOpen.set(false)">{{ t('checkout.cancel') }}</button><button type="button" class="primary-button" [disabled]="isProcessingPayment() || isLoadingCheckoutQuote() || !checkoutQuote() || (selectedPaymentMethod() === 'Cash' && !hasOpenCashShift()) || paidAmount() < cartFinalTotal()" (click)="processPayment()">{{ isProcessingPayment() ? t('checkout.processing') : t('checkout.complete') }}</button></div>
+		</div>
+	</div>
+}
+
+<!-- THERMAL SLIP -->
+@if (isSlipModalOpen() && completedOrder(); as slip) {
+	<div class="modal-overlay"><div class="modal-card printable-slip" role="dialog"><div class="slip-header"><h3>{{ auth.tenantName() }}</h3><p>{{ storeSettings().receiptHeaderNote }}</p><p>Order #: {{ slip.orderNo }} | {{ slip.createdAt | date:'medium' }}</p></div><table class="slip-table"><tbody>@for (item of slip.items; track item.id) {<tr><td>{{ item.productName }} x{{ item.quantity }}</td><td class="text-right">THB {{ item.subTotal | number:'1.2-2' }}</td></tr>}</tbody></table><div class="slip-totals"><div><span>{{ t('receipt.total') }}</span><strong>THB {{ slip.totalAmount | number:'1.2-2' }}</strong></div><div><span>{{ t('receipt.paid') }} ({{ slip.paymentMethod }}):</span><span>THB {{ slip.paidAmount | number:'1.2-2' }}</span></div><div><span>{{ t('receipt.change') }}</span><span>THB {{ slip.changeAmount | number:'1.2-2' }}</span></div></div><div class="slip-footer"><p>{{ storeSettings().receiptFooterNote }}</p></div><div class="modal-actions no-print"><button class="primary-button" (click)="printSlip()"><svg viewBox="0 0 24 24" class="icon"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-4 11H9v-5h6v5zm4-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2-9H7v4h10V3z"/></svg> {{ t('receipt.print') }}</button><button class="secondary-button" (click)="isSlipModalOpen.set(false)">{{ t('receipt.done') }}</button></div></div></div>
+}
+
+<!-- CASH SHIFT MODAL -->
+@if (isShiftModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card compact-modal" role="dialog" aria-modal="true" aria-labelledby="shift-modal-title">
+			<div class="modal-header">
+				<h3 id="shift-modal-title">{{ shiftModalMode() === 'Open' ? t('shift.openTitle') : t('shift.closeTitle') }}</h3>
+			</div>
+			<form (ngSubmit)="saveCashShift()">
+				<div class="modal-body">
+					@if (shiftError()) { <div class="error-alert" role="alert">{{ shiftError() }}</div> }
+					@if (shiftModalMode() === 'Open') {
+						<p class="modal-intro">{{ t('shift.openHelp') }}</p>
+						<div class="field-group">
+							<label for="opening-cash">{{ t('shift.openingCash') }}</label>
+							<div class="money-input"><span>THB</span><input id="opening-cash" type="number" min="0" step="0.01" inputmode="decimal" [ngModel]="openingCash()" (ngModelChange)="openingCash.set($event)" name="openingCash" autofocus required /></div>
+						</div>
+						<div class="field-group">
+							<label for="opening-note">{{ t('shift.note') }}</label>
+							<textarea id="opening-note" rows="3" [ngModel]="shiftOpeningNote()" (ngModelChange)="shiftOpeningNote.set($event)" name="openingNote" [placeholder]="t('shift.openingNotePlaceholder')"></textarea>
+						</div>
+					} @else if (currentCashShift(); as shift) {
+						<div class="reconciliation-summary">
+							<span>{{ t('shift.expectedCash') }}</span>
+							<strong>THB {{ shift.expectedCash | number:'1.2-2' }}</strong>
+							<small>{{ t('shift.expectedFormula') }}</small>
+						</div>
+						<div class="field-group">
+							<label for="counted-cash">{{ t('shift.countedCash') }}</label>
+							<div class="money-input"><span>THB</span><input id="counted-cash" type="number" min="0" step="0.01" inputmode="decimal" [ngModel]="countedCash()" (ngModelChange)="countedCash.set($event)" name="countedCash" autofocus required /></div>
+						</div>
+						<div class="variance-preview" [class.amount-negative]="countedCash() - shift.expectedCash < 0" [class.amount-positive]="countedCash() - shift.expectedCash > 0">
+							<span>{{ t('shift.difference') }}</span>
+							<strong>THB {{ countedCash() - shift.expectedCash | number:'1.2-2' }}</strong>
+						</div>
+						<div class="field-group">
+							<label for="closing-note">{{ t('shift.note') }}</label>
+							<textarea id="closing-note" rows="3" [ngModel]="shiftNotes()" (ngModelChange)="shiftNotes.set($event)" name="closingNote" [placeholder]="t('shift.closingNotePlaceholder')"></textarea>
+						</div>
+					}
+				</div>
+				<div class="modal-actions">
+					<button type="button" class="secondary-button" [disabled]="isSavingShift()" (click)="isShiftModalOpen.set(false)">{{ t('common.cancel') }}</button>
+					<button type="submit" class="primary-button" [disabled]="isSavingShift()">{{ isSavingShift() ? t('common.saving') : (shiftModalMode() === 'Open' ? t('shift.openAction') : t('shift.closeAction')) }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+<!-- CREATE MEMBER MODAL -->
+@if (isCustomerModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card compact-modal" role="dialog" aria-modal="true" aria-labelledby="customer-modal-title">
+			<div class="modal-header"><h3 id="customer-modal-title">{{ t('customers.add') }}</h3></div>
+			<form (ngSubmit)="saveCustomer()">
+				<div class="modal-body">
+					@if (customerError()) { <div class="error-alert" role="alert">{{ customerError() }}</div> }
+					<div class="field-group"><label for="new-member-name">{{ t('customers.name') }}</label><input id="new-member-name" type="text" autocomplete="name" [ngModel]="newCustomerName()" (ngModelChange)="newCustomerName.set($event)" name="newMemberName" autofocus required /></div>
+					<div class="field-group"><label for="new-member-phone">{{ t('customers.phone') }}</label><input id="new-member-phone" type="tel" inputmode="tel" autocomplete="tel" [ngModel]="newCustomerPhone()" (ngModelChange)="newCustomerPhone.set($event)" name="newMemberPhone" required /></div>
+					<div class="field-group"><label for="new-member-email">{{ t('customers.emailOptional') }}</label><input id="new-member-email" type="email" autocomplete="email" [ngModel]="newCustomerEmail()" (ngModelChange)="newCustomerEmail.set($event)" name="newMemberEmail" /></div>
+					<p class="form-help">{{ t('customers.pointsStartHint') }}</p>
+				</div>
+				<div class="modal-actions">
+					<button type="button" class="secondary-button" [disabled]="isSavingCustomer()" (click)="isCustomerModalOpen.set(false)">{{ t('common.cancel') }}</button>
+					<button type="submit" class="primary-button" [disabled]="isSavingCustomer()">{{ isSavingCustomer() ? t('common.saving') : t('customers.save') }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+<!-- PROMOTION MODAL -->
+@if (isPromotionModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="promotion-modal-title">
+			<div class="modal-header"><h3 id="promotion-modal-title">{{ editingPromotionId() ? t('promotions.edit') : t('promotions.add') }}</h3></div>
+			<form (ngSubmit)="savePromotion()">
+				<div class="modal-body">
+					@if (promotionError()) { <div class="error-alert" role="alert">{{ promotionError() }}</div> }
+					<div class="form-grid-2">
+						<div class="field-group"><label for="promo-code">{{ t('promotions.couponCode') }}</label><input id="promo-code" type="text" autocomplete="off" [ngModel]="promoCode()" (ngModelChange)="promoCode.set($event.toUpperCase())" name="promoCode" placeholder="SAVE10" autofocus required /></div>
+						<div class="field-group"><label for="promo-name">{{ t('promotions.campaignName') }}</label><input id="promo-name" type="text" [ngModel]="promoName()" (ngModelChange)="promoName.set($event)" name="promoName" required /></div>
+					</div>
+					<div class="form-grid-2">
+						<div class="field-group"><label for="promo-type">{{ t('promotions.discountType') }}</label><select id="promo-type" [ngModel]="promoDiscountType()" (ngModelChange)="promoDiscountType.set($event)" name="promoType"><option value="Percentage">{{ t('promotions.percentage') }}</option><option value="FixedAmount">{{ t('promotions.fixedAmount') }}</option></select></div>
+						<div class="field-group"><label for="promo-value">{{ promoDiscountType() === 'Percentage' ? t('promotions.percentValue') : t('promotions.bahtValue') }}</label><input id="promo-value" type="number" min="0.01" [max]="promoDiscountType() === 'Percentage' ? 100 : null" step="0.01" inputmode="decimal" [ngModel]="promoDiscountValue()" (ngModelChange)="promoDiscountValue.set($event)" name="promoValue" required /></div>
+					</div>
+					<div class="form-grid-3">
+						<div class="field-group"><label for="promo-min">{{ t('promotions.minSpend') }}</label><input id="promo-min" type="number" min="0" step="0.01" [ngModel]="promoMinimumSpend()" (ngModelChange)="promoMinimumSpend.set($event)" name="promoMinimum" /></div>
+						<div class="field-group"><label for="promo-max">{{ t('promotions.maxDiscount') }}</label><input id="promo-max" type="number" min="0" step="0.01" [ngModel]="promoMaximumDiscount()" (ngModelChange)="promoMaximumDiscount.set($event || null)" name="promoMaximum" /></div>
+						<div class="field-group"><label for="promo-limit">{{ t('promotions.usageLimit') }}</label><input id="promo-limit" type="number" min="1" step="1" [ngModel]="promoUsageLimit()" (ngModelChange)="promoUsageLimit.set($event || null)" name="promoLimit" /></div>
+					</div>
+					<div class="form-grid-2">
+						<div class="field-group"><label for="promo-start">{{ t('promotions.validFrom') }}</label><input id="promo-start" type="datetime-local" [ngModel]="promoStartsAt()" (ngModelChange)="promoStartsAt.set($event)" name="promoStart" /></div>
+						<div class="field-group"><label for="promo-end">{{ t('promotions.validUntil') }}</label><input id="promo-end" type="datetime-local" [ngModel]="promoEndsAt()" (ngModelChange)="promoEndsAt.set($event)" name="promoEnd" /></div>
+					</div>
+					<label class="switch-row"><input type="checkbox" [ngModel]="promoIsActive()" (ngModelChange)="promoIsActive.set($event)" name="promoActive" /><span>{{ t('promotions.activeAtCheckout') }}</span></label>
+				</div>
+				<div class="modal-actions">
+					<button type="button" class="secondary-button" [disabled]="isSavingPromotion()" (click)="closePromotionModal()">{{ t('common.cancel') }}</button>
+					<button type="submit" class="primary-button" [disabled]="isSavingPromotion()">{{ isSavingPromotion() ? t('common.saving') : t('promotions.save') }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+<!-- ORDER VOID / REFUND MODAL -->
+@if (isOrderActionModalOpen() && selectedOrder(); as order) {
+	<div class="modal-overlay">
+		<div class="modal-card" [class.compact-modal]="orderAction() === 'Void'" [class.refund-modal]="orderAction() === 'Refund'" role="alertdialog" aria-modal="true" aria-labelledby="order-action-title" aria-describedby="order-action-description">
+			<div class="modal-header"><h3 id="order-action-title">{{ orderAction() === 'Void' ? t('orders.voidTitle') : t('orders.refundTitle') }}</h3></div>
+			<div class="modal-body">
+				@if (orderActionError()) { <div class="error-alert" role="alert">{{ orderActionError() }}</div> }
+				<div class="order-action-summary">
+					<code>{{ order.orderNo }}</code>
+					<strong>THB {{ order.totalAmount | number:'1.2-2' }}</strong>
+					<span>{{ order.items.length }} {{ t('orders.items') }} · {{ order.paymentMethod }}</span>
+				</div>
+				<p id="order-action-description" class="warning-copy">{{ orderAction() === 'Void' ? t('orders.voidWarning') : t('orders.partialRefundWarning') }}</p>
+				@if (orderAction() === 'Refund') {
+					<section class="refund-selection" aria-labelledby="refund-selection-title">
+						<div class="refund-selection-header">
+							<h4 id="refund-selection-title">{{ t('orders.selectItems') }}</h4>
+							<div class="order-actions">
+								<button type="button" class="secondary-button" (click)="selectAllRefundItems()">{{ t('orders.refundAll') }}</button>
+								<button type="button" class="secondary-button" [disabled]="selectedRefundQuantity() === 0" (click)="clearRefundItems()">{{ t('orders.clearSelection') }}</button>
+							</div>
+						</div>
+						<div class="refund-line-list">
+							@for (item of order.items; track item.id) {
+								<div class="refund-line" [class.unavailable]="getRefundableQuantity(item) === 0">
+									<div class="refund-line-copy">
+										<strong>{{ item.productName }}</strong>
+										<span id="refund-help-{{ item.id }}">{{ t('orders.refundable') }} {{ getRefundableQuantity(item) }} / {{ item.quantity }} · {{ t('orders.alreadyRefunded') }} {{ item.refundedQuantity }}</span>
+									</div>
+									<div class="refund-quantity-control">
+										<button type="button" [disabled]="getRefundableQuantity(item) === 0 || (refundQuantities()[item.id] ?? 0) <= 0" (click)="adjustRefundQuantity(item, -1)" [attr.aria-label]="t('orders.refundQuantity') + ' − ' + item.productName">−</button>
+										<input id="refund-quantity-{{ item.id }}" type="number" inputmode="numeric" min="0" step="1" [max]="getRefundableQuantity(item)" [disabled]="getRefundableQuantity(item) === 0" [ngModel]="refundQuantities()[item.id] ?? 0" (ngModelChange)="setRefundQuantity(item, $event)" [attr.aria-label]="t('orders.refundQuantity') + ' ' + item.productName" [attr.aria-describedby]="'refund-help-' + item.id" />
+										<button type="button" [disabled]="getRefundableQuantity(item) === 0 || (refundQuantities()[item.id] ?? 0) >= getRefundableQuantity(item)" (click)="adjustRefundQuantity(item, 1)" [attr.aria-label]="t('orders.refundQuantity') + ' + ' + item.productName">+</button>
+									</div>
+								</div>
+							}
+						</div>
+						<div class="refund-totals" aria-live="polite">
+							<div><span>{{ t('orders.selectedQuantity') }}</span><strong>{{ selectedRefundQuantity() }}</strong></div>
+							<div><span>{{ t('orders.estimatedRefund') }}</span><strong>THB {{ estimatedRefundAmount() | number:'1.2-2' }}</strong></div>
+							<small>{{ t('orders.estimateNotice') }}</small>
+						</div>
+					</section>
+					<div class="restock-confirmation"><svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M20 7 12 2 4 7v10l8 5 8-5V7Zm-8 2.68L6.04 7 12 4.32 17.96 7 12 9.68ZM6 9.98l5 2.5v6.78l-5-3.13V9.98Zm7 9.28v-6.78l5-2.5v6.15l-5 3.13Z"/></svg><span>{{ t('orders.partialRefundWarning') }}</span></div>
+				} @else {
+					<div class="restock-confirmation"><svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M20 7 12 2 4 7v10l8 5 8-5V7Zm-8 2.68L6.04 7 12 4.32 17.96 7 12 9.68ZM6 9.98l5 2.5v6.78l-5-3.13V9.98Zm7 9.28v-6.78l5-2.5v6.15l-5 3.13Z"/></svg><span>{{ t('orders.restockAutomatic') }}</span></div>
+				}
+				<div class="field-group"><label for="order-action-reason">{{ t('orders.reason') }}</label><textarea id="order-action-reason" rows="4" [ngModel]="orderActionReason()" (ngModelChange)="orderActionReason.set($event); orderActionError.set('')" [attr.aria-invalid]="orderActionReason().length > 0 && orderActionReason().trim().length < 3" [placeholder]="t('orders.reasonPlaceholder')" autofocus></textarea></div>
+			</div>
+			<div class="modal-actions">
+				<button type="button" class="secondary-button" [disabled]="isProcessingOrderAction()" (click)="closeOrderActionModal()">{{ t('common.cancel') }}</button>
+				<button type="button" class="danger-button" [disabled]="isProcessingOrderAction() || orderActionReason().trim().length < 3 || (orderAction() === 'Refund' && selectedRefundQuantity() === 0)" (click)="submitOrderAction()">{{ isProcessingOrderAction() ? t('common.processing') : (orderAction() === 'Void' ? t('orders.confirmVoid') : t('orders.confirmRefund')) }}</button>
+			</div>
+		</div>
+	</div>
+}
+
+<!-- ADD/EDIT PRODUCT MODAL -->
+@if (isProductModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card" role="dialog">
+			<div class="modal-header">
+				<h3>{{ editingProductId() > 0 ? t('products.editProd') : t('products.addNew') }}</h3>
+			</div>
+			<div class="modal-body">
+				<div class="field-group"><label>{{ t('products.category') }}</label><select [ngModel]="prodCategoryId()" (ngModelChange)="prodCategoryId.set($event)">@for (cat of categories(); track cat.id) {<option [value]="cat.id">{{ cat.name }}</option>}</select></div>
+				<div class="form-grid-2">
+					<div class="field-group"><label>{{ t('products.barcode') }}</label><input type="text" [ngModel]="prodBarcode()" (ngModelChange)="prodBarcode.set($event)" placeholder="885..." /></div>
+					<div class="field-group"><label>{{ t('products.name') }}</label><input type="text" [ngModel]="prodName()" (ngModelChange)="prodName.set($event)" placeholder="ชื่อสินค้า..." /></div>
+				</div>
+				<div class="form-grid-3">
+					<div class="field-group"><label>{{ t('products.price') }}</label><input type="number" [ngModel]="prodPrice()" (ngModelChange)="prodPrice.set($event)" /></div>
+					<div class="field-group"><label>{{ t('products.cost') }}</label><input type="number" [ngModel]="prodCost()" (ngModelChange)="prodCost.set($event)" /></div>
+					<div class="field-group"><label>{{ t('products.stock') }}</label><input type="number" [ngModel]="prodStock()" (ngModelChange)="prodStock.set($event)" /></div>
+				</div>
+				<div class="image-attach-box">
+					<label class="section-label">{{ t('products.attachImage') }}</label>
+					<input type="file" accept="image/*" (change)="onFileSelected($event)" class="file-picker-input" />
+					<input type="text" [ngModel]="prodImageUrl()" (ngModelChange)="prodImageUrl.set($event)" placeholder="หรือวาง URL รูปภาพ (https://...)" />
+				</div>
+				@if (prodImageUrl()) {
+					<div class="image-preview-container">
+						<img [src]="prodImageUrl()" class="image-preview" alt="Preview" />
+						<button type="button" class="danger-button compact" (click)="prodImageUrl.set('')">{{ t('products.removeImage') }}</button>
+					</div>
+				}
+			</div>
+			<div class="modal-actions"><button class="secondary-button" (click)="isProductModalOpen.set(false)">{{ t('common.cancel') }}</button><button class="primary-button" (click)="saveProduct()">{{ t('products.save') }}</button></div>
+		</div>
+	</div>
+}
+
+<!-- DELETE CONFIRM MODAL -->
+@if (isDeleteConfirmOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card compact-modal" role="dialog">
+			<div class="modal-header">
+				<h3>{{ t('common.confirm') }}</h3>
+			</div>
+			<div class="modal-body text-center">
+				<p class="confirm-text">{{ t('products.confirmDelete') }}</p>
+			</div>
+			<div class="modal-actions"><button class="secondary-button" (click)="isDeleteConfirmOpen.set(false)">{{ t('common.cancel') }}</button><button class="danger-button" (click)="executeDeleteProduct()">{{ t('common.delete') }}</button></div>
+		</div>
+	</div>
+}
+
+<!-- STAFF MODAL -->
+@if (isStaffModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card" role="dialog">
+			<div class="modal-header">
+				<h3>{{ editingStaffId() > 0 ? t('products.edit') + ' Staff' : t('staff.addStaff') }}</h3>
+			</div>
+			<div class="modal-body">
+				@if (editingStaffId() === 0) { <div class="field-group"><label>{{ t('staff.email') }}</label><input type="email" [ngModel]="staffEmail()" (ngModelChange)="staffEmail.set($event)" placeholder="staff@store.com" /></div> }
+				<div class="field-group"><label>{{ t('staff.name') }}</label><input type="text" [ngModel]="staffFullName()" (ngModelChange)="staffFullName.set($event)" placeholder="ชื่อ-นามสกุล..." /></div>
+				<div class="form-grid-2">
+					<div class="field-group"><label>{{ t('staff.code') }}</label><input type="text" [ngModel]="staffEmployeeCode()" (ngModelChange)="staffEmployeeCode.set($event)" placeholder="001" /></div>
+					<div class="field-group"><label>{{ t('staff.position') }}</label><input type="text" [ngModel]="staffPositionTitle()" (ngModelChange)="staffPositionTitle.set($event)" placeholder="Senior Cashier" /></div>
+				</div>
+				<div class="field-group"><label>{{ t('staff.role') }}</label><select [ngModel]="staffRole()" (ngModelChange)="staffRole.set($event)"><option value="Owner">Owner</option><option value="Manager">Manager</option><option value="Cashier">Cashier</option></select></div>
+				<div class="perm-section">
+					<label class="section-label">กำหนดสิทธิ์การใช้งาน (Permissions)</label>
+					<div class="perm-grid">
+						<label><input type="checkbox" [ngModel]="staffCanCheckout()" (ngModelChange)="staffCanCheckout.set($event)" /> {{ t('staff.canCheckout') }}</label>
+						<label><input type="checkbox" [ngModel]="staffCanProducts()" (ngModelChange)="staffCanProducts.set($event)" /> {{ t('staff.canProducts') }}</label>
+						<label><input type="checkbox" [ngModel]="staffCanReports()" (ngModelChange)="staffCanReports.set($event)" /> {{ t('staff.canReports') }}</label>
+						<label><input type="checkbox" [ngModel]="staffCanUsers()" (ngModelChange)="staffCanUsers.set($event)" /> {{ t('staff.canUsers') }}</label>
+					</div>
+				</div>
+			</div>
+			<div class="modal-actions"><button class="secondary-button" (click)="isStaffModalOpen.set(false)">{{ t('common.cancel') }}</button><button class="primary-button" (click)="saveStaff()">{{ t('staff.save') }}</button></div>
+		</div>
+	</div>
+}
+
+<!-- STORE SETTINGS MODAL -->
+@if (isStoreSettingsModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card" role="dialog">
+			<div class="modal-header">
+				<h3>{{ t('settings.title') }}</h3>
+			</div>
+			<div class="modal-body">
+				<div class="form-grid-2">
+					<div class="field-group">
+						<label>{{ t('settings.vatRate') }}</label>
+						<input type="number" min="0" max="100" step="0.5" [ngModel]="settingsVatRate()" (ngModelChange)="settingsVatRate.set($event)" placeholder="7" />
+					</div>
+					<div class="field-group">
+						<label>{{ t('settings.serviceChargeRate') }}</label>
+						<input type="number" min="0" max="100" step="0.5" [ngModel]="settingsServiceChargeRate()" (ngModelChange)="settingsServiceChargeRate.set($event)" placeholder="0" />
+					</div>
+				</div>
+				<div class="image-attach-box" style="margin-top:14px">
+					<label class="section-label">{{ t('settings.qrCode') }}</label>
+					<input type="file" accept="image/*" (change)="onQrCodeFileSelected($event)" class="file-picker-input" />
+					<input type="text" [ngModel]="settingsQrCodeUrl()" (ngModelChange)="settingsQrCodeUrl.set($event)" placeholder="หรือวาง URL รูปภาพ QR Code (https://...)" />
+				</div>
+				@if (settingsQrCodeUrl()) {
+					<div class="image-preview-container">
+						<img [src]="settingsQrCodeUrl()" class="qr-preview-img" alt="QR Preview" style="max-height:160px;border-radius:12px;margin:0 auto;display:block;" />
+						<button type="button" class="danger-button compact" (click)="settingsQrCodeUrl.set(null)">{{ t('products.removeImage') }}</button>
+					</div>
+				}
+				<div class="field-group" style="margin-top:14px">
+					<label>{{ t('settings.receiptHeader') }}</label>
+					<input type="text" [ngModel]="settingsReceiptHeader()" (ngModelChange)="settingsReceiptHeader.set($event)" placeholder="Welcome to Coffee Bar Central!" />
+				</div>
+				<div class="field-group">
+					<label>{{ t('settings.receiptFooter') }}</label>
+					<input type="text" [ngModel]="settingsReceiptFooter()" (ngModelChange)="settingsReceiptFooter.set($event)" placeholder="Tax ID: 0105560000000 - Thank you!" />
+				</div>
+				<div class="field-group">
+					<label for="business-timezone">{{ t('settings.businessTimezone') }}</label>
+					<input id="business-timezone" type="text" list="business-timezones" autocomplete="off" [ngModel]="settingsBusinessTimeZoneId()" (ngModelChange)="settingsBusinessTimeZoneId.set($event)" aria-describedby="business-timezone-hint" placeholder="Asia/Bangkok" />
+					<small id="business-timezone-hint" class="field-hint">{{ t('settings.timezoneHint') }}</small>
+					<datalist id="business-timezones">
+						<option value="Asia/Bangkok"></option>
+						<option value="Asia/Singapore"></option>
+						<option value="Asia/Tokyo"></option>
+						<option value="Europe/London"></option>
+						<option value="America/New_York"></option>
+					</datalist>
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button class="secondary-button" (click)="isStoreSettingsModalOpen.set(false)">{{ t('common.cancel') }}</button>
+				<button class="primary-button" [disabled]="!settingsBusinessTimeZoneId().trim()" (click)="saveStoreSettings()">{{ t('settings.save') }}</button>
+			</div>
+		</div>
+	</div>
+}
+
+<!-- SWITCH STAFF MODAL -->
+@if (isSwitchStaffModalOpen()) {
+	<div class="modal-overlay">
+		<div class="modal-card compact-modal" role="dialog">
+			<div class="modal-header">
+				<h3>{{ t('staff.switch') }}</h3>
+			</div>
+			<div class="modal-body">
+				<p class="section-label" style="margin-bottom:12px">{{ t('staff.currentCashier') }}: <strong>{{ activeStaffUser() ? activeStaffUser()?.fullName : auth.currentUser()?.fullName }}</strong></p>
+				<div class="staff-select-list">
+					@for (staff of staffUsers(); track staff.id) {
+						<div class="staff-select-card" [class.selected]="activeStaffUser()?.id === staff.id" (click)="selectActiveStaffUser(staff)">
+							<div class="staff-select-info">
+								<strong><code>{{ staff.employeeCode }}</code> {{ staff.fullName }}</strong>
+								<span class="staff-select-meta">{{ staff.positionTitle }} | {{ staff.role }}</span>
+							</div>
+							<span class="badge" [class.badge-success]="activeStaffUser()?.id === staff.id" [class.badge-secondary]="activeStaffUser()?.id !== staff.id">
+								{{ activeStaffUser()?.id === staff.id ? 'Active' : 'Select' }}
+							</span>
+						</div>
+					}
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button class="secondary-button" (click)="isSwitchStaffModalOpen.set(false)">{{ t('common.cancel') }}</button>
+			</div>
+		</div>
+	</div>
+}

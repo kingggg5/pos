@@ -1,0 +1,16 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+.vs/
+.vscode/
+*.user
+*.suo
+.env
+.codex/
+.impeccable/
+*.log
+*.db
+*.sqlite
+*.sqlite3

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SmartPos.Api.Tests/SmartPos.Api.Tests.csproj" />
+  <Project Path="SmartPos.Api/SmartPos.Api.csproj" />
+</Solution>

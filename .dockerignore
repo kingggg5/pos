@@ -1,0 +1,10 @@
+.git
+.impeccable
+.agents
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/*.db
+**/*.user
+**/*.log
