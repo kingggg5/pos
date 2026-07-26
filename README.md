@@ -1,5 +1,9 @@
 # Smart POS
 
+> **Live Cloud Deployment Demo**:
+> - 🌐 **Frontend (Vercel)**: [https://pos-roan-three.vercel.app](https://pos-roan-three.vercel.app)
+> - ⚙️ **Backend API (Somee)**: [http://smart-pos-api.somee.com](http://smart-pos-api.somee.com)
+
 ระบบ Point of Sale แบบ Multi-Tenant สำหรับร้านค้า คาเฟ่ และร้านอาหาร รองรับงานขายหน้าร้าน สต็อกสินค้า กะเงินสด สมาชิก แต้มสะสม คูปอง และการคืนเงิน โดยแยกข้อมูลของแต่ละร้านด้วย `TenantId` จาก JWT และ EF Core global query filters
 
 ## ความสามารถหลัก
