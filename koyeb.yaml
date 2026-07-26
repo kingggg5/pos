@@ -1,0 +1,22 @@
+type: web
+name: smart-pos-api
+routes:
+  - path: /
+    port: 8080
+definition:
+  name: smart-pos-api
+  docker:
+    dockerfile: backend/SmartPos.Api/Dockerfile
+  env:
+    - key: ASPNETCORE_ENVIRONMENT
+      value: Production
+    - key: UseSqlite
+      value: "true"
+    - key: Jwt__SigningKey
+      value: SmartPos_Production_Secret_Signing_Key_2026_Enterprise_Secure!
+    - key: Jwt__Issuer
+      value: SmartPos.Api
+    - key: Jwt__Audience
+      value: SmartPos.Web
+    - key: Cors__AllowedOrigins__0
+      value: "*"
