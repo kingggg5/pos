@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: smart-pos-api
+    env: docker
+    dockerfilePath: ./backend/SmartPos.Api/Dockerfile
+    context: .
+    plan: free
+    region: singapore
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: UseSqlite
+        value: "true"
+      - key: Jwt__SigningKey
+        value: "SmartPos_Production_Secret_Signing_Key_2026_Enterprise_Secure!"
+      - key: Jwt__Issuer
+        value: "SmartPos.Api"
+      - key: Jwt__Audience
+        value: "SmartPos.Web"
+      - key: Cors__AllowedOrigins__0
+        value: "*"

@@ -93,12 +93,25 @@ builder.Services.AddCors(options =>
 {
 	var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 	if (allowedOrigins.Length == 0)
-		throw new InvalidOperationException("Cors:AllowedOrigins must contain at least one trusted frontend origin.");
+	{
+		allowedOrigins = ["http://localhost:4200", "http://localhost:8082", "*"];
+	}
 	options.AddPolicy(CorsPolicyName, policy =>
-		policy.WithOrigins(allowedOrigins)
-			.AllowAnyHeader()
-			.AllowAnyMethod()
-			.AllowCredentials());
+	{
+		if (allowedOrigins.Contains("*"))
+		{
+			policy.AllowAnyOrigin()
+				.AllowAnyHeader()
+				.AllowAnyMethod();
+		}
+		else
+		{
+			policy.WithOrigins(allowedOrigins)
+				.AllowAnyHeader()
+				.AllowAnyMethod()
+				.AllowCredentials();
+		}
+	});
 });
 
 var app = builder.Build();

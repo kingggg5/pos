@@ -32,7 +32,7 @@ import {
 	ZReportSummary
 } from '../models/pos.models';
 
-const API_BASE = '/api';
+const API_BASE = (typeof window !== 'undefined' && (window as any).API_BASE) || '/api';
 
 @Injectable({ providedIn: 'root' })
 export class PosApiService {
